@@ -1,7 +1,7 @@
 /*
-    Kotryna Šlepetytė
+    Kotryna Slepetyte
     Informatika, 3k. 2gr.
-    Užduotis: 3. Pirminių skaičių generavimas "Eratosthenes" rėčio metodu.
+    Uzduotis: 3. Pirminiu skaiciu generavimas "Eratosthenes" recio metodu.
 */
 
 public class Main {
