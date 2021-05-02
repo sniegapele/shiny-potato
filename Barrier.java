@@ -19,7 +19,6 @@ public class Barrier {
 
     public synchronized long waitBarrier(long suggestion) throws InterruptedException {
         suggestions.add(suggestion);
-//        long currentSuggestion = -1;
 
         if (suggestions.size() != numberOfParticipants) {
             wait();
@@ -33,8 +32,6 @@ public class Barrier {
     }
 
     private void chooseSuggestion() {
-//        System.out.println("suggestions "+Arrays.toString(suggestions.toArray()));
-
         currentSuggestion = upperBound + 1;
         for (int i = 0; i < suggestions.size(); i++) {
             if (suggestions.get(i) > 0) {
@@ -47,22 +44,5 @@ public class Barrier {
         if (currentSuggestion > middle) {
             currentSuggestion = -1;
         }
-
-//        if (currentSuggestion == upperBound + 1) {
-//            currentSuggestion = -1;
-//        }
-
-////        System.out.println(currentSuggestion);
-//        return currentSuggestion;
     }
-//
-//    public synchronized void waitForEnd() throws InterruptedException {
-//        numberOfParticipants--;
-//
-//        if(numberOfParticipants!=0){
-//            wait();
-//        }else{
-//            notifyAll();
-//        }
-//    }
 }

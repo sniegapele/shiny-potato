@@ -36,49 +36,17 @@ public class MyThread extends Thread {
         while (received > 0) {
             try {
                 received = barrier.waitBarrier(currentSuggestion);
-//                System.out.println(received);
 
                 if (received > 0) {
                     removeMultiples(received);
-//                    System.out.println(this.getName()+" "+Arrays.toString(numbersPart));
                     prepareSuggestion(received);
-//                    System.out.println(currentSuggestion);
                 }
-//                break;
             } catch (Exception e) {
                 System.out.println(e.toString());
             }
         }
-
     }
 
-    //
-//    @Override
-//    public void run() {
-//        long received = 1;
-//        prepareSuggestion(received);
-//
-//        while (received > 0) {
-//            try {
-//                received = barrier.waitBarrier(currentSuggestion);
-//
-//                if (received > 0) {
-//                    removeMultiples(received);
-//                    prepareSuggestion(received);
-//                }
-////                else {
-////                    barrier.waitForEnd();
-////                }
-//
-//            }catch (Exception e){
-//                System.out.println(e);
-//                System.out.println("something went wrong with barrier :(");
-//            }
-//        }
-//
-////        System.out.println(Arrays.toString(numbersPart));
-//    }
-//
     private void prepareSuggestion(long received) {
         if (lowerBound > middle) {
             currentSuggestion = -1;
@@ -117,13 +85,6 @@ public class MyThread extends Thread {
     private void removeMultiples(long received) {
         long startNumber;
 
-//        i^2+k*i>=lowerBound
-//        k>=(lowerBound-i^2)/i
-//        lower=12 i=3 --> k=1 --> start=9+3=12
-//        lower=11 i=3 --> k=2/3=0 --> start = 9
-//        lower=14 i=3 --> k=5/3=1 --> start = 9+3=12
-//        lower=2 i=3 --> k=
-
         long coef = (lowerBound - received * received) / received;
 
         if (coef < 0) {
@@ -134,33 +95,9 @@ public class MyThread extends Thread {
             startNumber = received * received + coef * received;
         }
 
-//        System.out.println("start: "+startNumber);
-
         for (long i = startNumber; i <= upperBound; i += received) {
             numbersPart[(int) (i - lowerBound)] = false;
         }
-
-//        if (lowerBound % received == 0) {
-//            startNumber = lowerBound / received;
-//        } else {
-//            startNumber = lowerBound / received + 1;
-//        }
-
-//        long endNumber = upperBound / received;
-
-//        for (long i = startNumber; i <= endNumber; i++) {
-//            long number = i * received;
-//            long index = number - lowerBound;
-//            if (numbersPart[(int) index] > 0 && numbersPart[(int) index] != received) {
-//                numbersPart[(int) index] = -1;
-//            }
-//
-//        }
-////        System.out.println(Arrays.toString(numbersPart));
-//    }
-//
-//    public long[] getNumbersPart() {
-//        return numbersPart;
     }
 
     public long getPrimeNumbers() {
@@ -168,7 +105,6 @@ public class MyThread extends Thread {
 
         for (int i = 0; i < numbersPart.length; i++) {
             if (numbersPart[i]) {
-//                System.out.println(i + lowerBound);
                 counter++;
             }
         }
