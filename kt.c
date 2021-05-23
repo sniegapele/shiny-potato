@@ -18,29 +18,26 @@ int main(int argc, char *argv[])
         return -1;
     }
     
-    int         myrank;
+    int myrank;
 
-    MPI_Init(&argc, &argv);   		/* initialize MPI */
-    MPI_Comm_rank(MPI_COMM_WORLD,   /* always use this */
-                  &myrank);      	/* process rank, 0 thru N-1 */
+    MPI_Init(&argc, &argv); 
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank); 
 
     if (myrank == 0) {
         master();
     } else {
         slave();
     }
-    MPI_Finalize();       /* cleanup MPI */
+    MPI_Finalize();
 }
 
 void master()
 {
     int	ntasks, rank, work=0;
-    double       result;
-    MPI_Status     status;
+    double result;
+    MPI_Status status;
 
-    MPI_Comm_size(
-            MPI_COMM_WORLD,   /* always use this */
-            &ntasks);          /* #processes in application */
+    MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
 /*
 * Seed the slaves.
 */
