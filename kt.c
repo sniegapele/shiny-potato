@@ -9,6 +9,15 @@ void slave();
 
 int main(int argc, char *argv[])
 {
+    if (argc != 2) {
+        printf("Invalid number of parameters!");
+        return -1;
+    }
+    if (atoi(argv[1]) <= 2) {
+        printf("Invalid upper bound!");
+        return -1;
+    }
+    
     int         myrank;
 
     MPI_Init(&argc, &argv);   		/* initialize MPI */
