@@ -1,31 +1,32 @@
 #include <mpi.h>
 #include <stdio.h>
 
-#define WORKTAG    1
-#define DIETAG     2
+#define WORKTAG 1
+#define DIETAG 2
 
 void master();
 void slave();
 
 int main(int argc, char *argv[])
 {
-	int         myrank;
+	int myrank;
 
-	MPI_Init(&argc, &argv);   		/* initialize MPI */
+	MPI_Init(&argc, &argv);   	/* initialize MPI */
 	MPI_Comm_rank(MPI_COMM_WORLD,   /* always use this */
-					&myrank);      	/* process rank, 0 thru N-1 */
+			&myrank);      	/* process rank, 0 thru N-1 */
 
 	if (myrank == 0) {
 		master();
 	} else {
 		slave();
 	}
-	MPI_Finalize();       /* cleanup MPI */
+	MPI_Finalize();			/* cleanup MPI */
 }
 
 void master()
 {
 	int	ntasks, rank, work=0;
+	printf("%d\n",ntasks);
 	double       result;
 	MPI_Status     status;
 
