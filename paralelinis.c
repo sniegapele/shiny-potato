@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 	
 	if(upperBound <=2) {
 		printf("Invalid arguments!");
+		return -1;
 	}
 	
 	int myrank;
