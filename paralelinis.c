@@ -8,9 +8,10 @@
 
 void master(long upperBound);
 void slave(long upperBound);
-void initArray(bool *array, int numberOfElements);
-void analysePrimes(bool *array, int upperBound);
-long countPrimeNumbers(bool *array, int numberOfElements);
+void initArray(bool *array, long numberOfElements);
+void analysePrimes(bool *array, long upperBound);
+long countPrimeNumbers(bool *array, long numberOfElements);
+void generatePrimeNumbersList(bool *array, long *primes, long numberOfElements);
 
 int main(int argc, char *argv[])
 {
@@ -40,8 +41,14 @@ void master(long upperBound)
 	bool primeNumbers[upperBound - 1];
 	initArray(primeNumbers, upperBound - 1);
 	analysePrimes(primeNumbers, upperBound);
-	//long primes[countPrimeNumbers(primeNumbers, upperBound - 1)];
-	printf("%d\n",countPrimeNumbers(primeNumbers, upperBound - 1));
+	long numberOfPrimes = countPrimeNumbers(primeNumbers, upperBound - 1);
+	long primes[numberOfPrimes];
+	//printf("%d\n",countPrimeNumbers(primeNumbers, upperBound - 1));
+	generatePrimeNumbersList(primeNumbers, primes, upperBound - 1);
+	
+	for(long i=0;i<numberOfPrimes;i++){
+		printf("%d\n",primes[i]);
+	}
 	
 	int	ntasks, rank, work=0;
 	double       result;
@@ -138,14 +145,14 @@ void slave(long upperBound)
 	}
 }
 
-void initArray(bool *array, int numberOfElements) {
-	for (int i = 0; i < numberOfElements; i++) {
+void initArray(bool *array, long numberOfElements) {
+	for (long i = 0; i < numberOfElements; i++) {
 		array[i] = true;
 	}
 }
 
-void analysePrimes(bool *array, int upperBound) {
-	for (int i = 2; i < sqrt(upperBound); i++) {
+void analysePrimes(bool *array, long upperBound) {
+	for (long i = 2; i < sqrt(upperBound); i++) {
 		if (array[i - 2]) {
 			for (int j = i * i; j <= upperBound; j += i) {
 				array[j - 2] = false;
@@ -154,7 +161,7 @@ void analysePrimes(bool *array, int upperBound) {
 	}
 }
 
-long countPrimeNumbers(bool *array, int numberOfElements) {
+long countPrimeNumbers(bool *array, long numberOfElements) {
 	long count = 0;
 	for (int i = 0; i < numberOfElements; i++) {
 		if (array[i]) {
@@ -162,4 +169,14 @@ long countPrimeNumbers(bool *array, int numberOfElements) {
 		}
 	}
 	return count;
+}
+
+void generatePrimeNumbersList(bool *array, long *primes, long numberOfElements){
+	long index = 0;
+	for(long i = 0; i < numberOfElements; i++){
+		if(array[i]){
+			primes[index]= i + 2;
+			index++;
+		}
+	}
 }
