@@ -4,8 +4,8 @@
 #define WORKTAG 1
 #define DIETAG 2
 
-void master();
-void slave();
+void master(long upperBound);
+void slave(long upperBound);
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	
 	if(upperBound <=2) {
 		printf("Invalid arguments!");
-		return -1;
+		return 0;
 	}
 	
 	int myrank;
@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
 			&myrank);      	/* process rank, 0 thru N-1 */
 
 	if (myrank == 0) {
-		master();
+		master(upperBound);
 	} else {
-		slave();
+		slave(upperBound);
 	}
 	MPI_Finalize();			/* cleanup MPI */
 }
 
-void master()
+void master(long upperBound)
 {
 	int	ntasks, rank, work=0;
 	double       result;
@@ -98,7 +98,7 @@ void master()
 	}
 }
 
-void slave()
+void slave(long upperBound)
 {
 	double              result;
 	int                 work;
