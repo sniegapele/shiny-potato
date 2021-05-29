@@ -1,125 +1,121 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <time.h>
 #include <mpi.h>
+#include <stdio.h>
 
-void initArray(bool *array, int numberOfElements) {
-    for (int i = 0; i < numberOfElements; i++) {
-        array[i] = true;
-    }
+#define WORKTAG    1
+#define DIETAG     2
+
+void master();
+void slave();
+
+int main(int argc, char *argv[])
+{
+	int         myrank;
+
+	MPI_Init(&argc, &argv);   		/* initialize MPI */
+	MPI_Comm_rank(MPI_COMM_WORLD,   /* always use this */
+					&myrank);      	/* process rank, 0 thru N-1 */
+
+	if (myrank == 0) {
+		master();
+	} else {
+		slave();
+	}
+	MPI_Finalize();       /* cleanup MPI */
 }
 
-int countPrimeNumbers(bool *array, int numberOfElements) {
-    int count = 0;
-    for (int i = 0; i < numberOfElements; i++) {
-        if (array[i]) {
-            count++;
-        }
-    }
-    return count;
+void master()
+{
+	int	ntasks, rank, work=0;
+	double       result;
+	MPI_Status     status;
+
+	MPI_Comm_size(
+		MPI_COMM_WORLD,   /* always use this */
+		&ntasks);          /* #processes in application */
+/*
+* Seed the slaves.
+*/
+	for (rank = 1; rank < ntasks; ++rank) 
+	{
+		work ++; /* get_next_work_request: @pakeisti i realu darbo aprasa */
+		
+		MPI_Send(&work,         /* message buffer */
+		1,              /* one data item */
+		MPI_INT,        /* data item is an integer */
+		rank,           /* destination process rank */
+		WORKTAG,        /* user chosen message tag */
+		MPI_COMM_WORLD);/* always use this */
+
+		printf("Master(1): Procesui %d issiustas duomuo %d\n", rank, work);
+
+	}
+
+/*
+* Receive a result from any slave and dispatch a new work
+* request work requests have been exhausted.
+*/
+ 	work ++; /* @pakeisti: get_next_work_request */;
+	while (   work < 10 /* @pakeisti: valid new work request */) {
+		MPI_Recv(&result,       /* message buffer */
+		1,              /* one data item */
+		MPI_DOUBLE,     /* of type double real */
+		MPI_ANY_SOURCE, /* receive from any sender */
+		MPI_ANY_TAG,    /* any type of message */
+		MPI_COMM_WORLD, /* always use this */
+		&status);       /* received message info */
+		
+		printf("Master(2): Is proceso %d gautas duomuo %f\n", status.MPI_SOURCE, result);
+
+		MPI_Send(&work, 1, MPI_INT, status.MPI_SOURCE,
+			WORKTAG, MPI_COMM_WORLD);
+
+		printf("Master(3): Procesui %d issiustas duomuo %d\n", status.MPI_SOURCE, work);
+
+		work++; /* @pakeisti: get_next_work_request */;
+	}
+/*
+* Receive results for outstanding work requests.
+*/
+	for (rank = 1; rank < ntasks; ++rank) {
+		MPI_Recv(&result, 1, MPI_DOUBLE, MPI_ANY_SOURCE,
+		MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+		printf("Master(4): Is proceso %d gautas duomuo %f\n", status.MPI_SOURCE, result);
+	}
+/*
+* Tell all the slaves to exit.
+*/
+	for (rank = 1; rank < ntasks; ++rank) {
+		MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
+		printf("Master(5): sustabdyti procesa %d\n", rank);
+	}
 }
 
-void printResults(int primeNumbers, double time) {
-    printf("Prime numbers found: %d\n", primeNumbers);
-    printf("Time elapsed: %.5f\n", time);
+void slave()
+{
+	double              result;
+	int                 work;
+	MPI_Status          status;
+	for (;;) 
+	{
+		MPI_Recv(&work, 1, MPI_INT, 0, MPI_ANY_TAG,
+			MPI_COMM_WORLD, &status);
+
+/*
+* Check the tag of the received message.
+*/
+		if (status.MPI_TAG == DIETAG) {
+			printf("Slave(1): atsiusta baigmes zyme\n");
+			return;
+		}
+		else
+		{
+			printf("Slave(2): atsiustas duomuo %d\n", work);
+
+			result = work * work; /* @pakeisti do the work */
+			MPI_Send(&result, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+
+			printf("Slave(3): issiustas rezultatas %f\n", result);
+		}
+	}
 }
-
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        printf("Invalid number of parameters!");
-        return -1;
-    }
-    if (atoi(argv[1]) <= 2) {
-        printf("Invalid upper bound!");
-        return -1;
-    }
-
-    // program init
-    MPI_Init(&argc, &argv);
-//    int busy = atoi(argv[2]);
-//    printf("%d",busy);
-
-    // caller rank: master = 0
-    int rank = 0;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    // number of participants in communication
-    int participants;
-    MPI_Comm_size(MPI_COMM_WORLD, &participants);
-
-    MPI_Status status;
-
-    if (rank == 0) {
-        printf("Total number of procs: %d\n", participants);
-    }
-
-    double startTime = (double) clock();
-
-    int upperBound = atoi(argv[1]);
-
-    bool primeNumbers[upperBound - 1];
-    initArray(primeNumbers, upperBound - 1);
-
-    // seeder/master caller
-    if (rank == 0) {
-        int number = 2;
-        int response;
-
-//        for (int i = 1; i < participants; i++) {
-//            MPI_Send(&number, 1, MPI_INT, i, 1, MPI_COMM_WORLD);
-//            do {
-//                number++;
-//            } while (!primeNumbers[number - 2]);
-//        }
-
-        // darbu siuntimas
-        while (number <= sqrt(upperBound)) {
-            printf("Cia\n");
-            MPI_Recv(&response, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
-            printf("Ir dar cia\n");
-            MPI_Send(&number, 1, MPI_INT, status.MPI_SOURCE, 1, MPI_COMM_WORLD);
-            do {
-                number++;
-            } while (!primeNumbers[number - 2]);
-            number++;
-        }
-
-        int endFlag = -1;
-        // siunciamos darbo pabaigos zymes procesams
-        for (int i = 1; i < participants; i++) {
-            MPI_Recv(&response, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
-            MPI_Send(&endFlag, 1, MPI_INT, status.MPI_SOURCE, 1, MPI_COMM_WORLD);
-        }
-
-    } else {
-        int result = 0;
-        int received = 0;
-
-        while (received >= 0) {
-            printf("dar");
-            MPI_Recv(&received, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
-            MPI_Send(&result, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-
-//            MPI_Recv(&received, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
-
-            for (int i = received * received; i <= upperBound; i += received) {
-                if (primeNumbers[i - 2]) {
-                    primeNumbers[i - 2] = false;
-                }
-            }
-        }
-    }
-
-    int result = countPrimeNumbers(primeNumbers, upperBound - 1);
-
-    double endTime = (double) clock();
-
-    MPI_Finalize();
-
-    printResults(result, (endTime - startTime) / CLOCKS_PER_SEC);
-
-    return 0;
-}
-
