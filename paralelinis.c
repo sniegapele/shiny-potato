@@ -26,7 +26,6 @@ int main(int argc, char *argv[])
 void master()
 {
 	int	ntasks, rank, work=0;
-	printf("%d\n",ntasks);
 	double       result;
 	MPI_Status     status;
 
@@ -51,7 +50,6 @@ void master()
 
 	}
 
-	printf("%d\n",ntasks);
 /*
 * Receive a result from any slave and dispatch a new work
 * request work requests have been exhausted.
