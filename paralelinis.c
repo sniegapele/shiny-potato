@@ -9,6 +9,12 @@ void slave();
 
 int main(int argc, char *argv[])
 {
+	long upperBound = atol(argv[1]);
+	
+	if(upperBound <=2) {
+		printf("Invalid arguments!");
+	}
+	
 	int myrank;
 
 	MPI_Init(&argc, &argv);   	/* initialize MPI */
