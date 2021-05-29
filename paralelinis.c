@@ -51,6 +51,7 @@ void master()
 
 	}
 
+	printf("%d\n",ntasks);
 /*
 * Receive a result from any slave and dispatch a new work
 * request work requests have been exhausted.
