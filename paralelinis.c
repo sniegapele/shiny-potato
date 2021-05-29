@@ -1,5 +1,6 @@
 #include <mpi.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define WORKTAG 1
 #define DIETAG 2
