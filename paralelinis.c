@@ -6,6 +6,9 @@
 
 void master(long upperBound);
 void slave(long upperBound);
+void initArray(bool *array, int numberOfElements);
+void analysePrimes(bool *array, int upperBound);
+long countPrimeNumbers(bool *array, int numberOfElements);
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +35,12 @@ int main(int argc, char *argv[])
 
 void master(long upperBound)
 {
+	bool primeNumbers[upperBound - 1];
+	initArray(primeNumbers, upperBound - 1);
+	analysePrimes(primeNumbers, upperBound);
+	//long primes[countPrimeNumbers(primeNumbers, upperBound - 1)];
+	printf("%d\n",countPrimeNumbers(primeNumbers, upperBound - 1));
+	
 	int	ntasks, rank, work=0;
 	double       result;
 	MPI_Status     status;
@@ -125,4 +134,30 @@ void slave(long upperBound)
 			printf("Slave(3): issiustas rezultatas %f\n", result);
 		}
 	}
+}
+
+void initArray(bool *array, int numberOfElements) {
+	for (int i = 0; i < numberOfElements; i++) {
+		array[i] = true;
+	}
+}
+
+void analysePrimes(bool *array, int upperBound) {
+	for (int i = 2; i < sqrt(upperBound); i++) {
+		if (array[i - 2]) {
+			for (int j = i * i; j <= upperBound; j += i) {
+				array[j - 2] = false;
+			}
+		}
+	}
+}
+
+long countPrimeNumbers(bool *array, int numberOfElements) {
+	long count = 0;
+	for (int i = 0; i < numberOfElements; i++) {
+		if (array[i]) {
+			count++;
+		}
+	}
+	return count;
 }
