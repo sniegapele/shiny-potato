@@ -8,25 +8,25 @@
 #include <math.h>
 #include <time.h>
 
-void initArray(bool *array, int numberOfElements) {
-    for (int i = 0; i < numberOfElements; i++) {
+void initArray(bool *array, long numberOfElements) {
+    for (long i = 0; i < numberOfElements; i++) {
         array[i] = true;
     }
 }
 
-void analysePrimes(bool *array, int upperBound) {
-    for (int i = 2; i < sqrt(upperBound); i++) {
+void analysePrimes(bool *array, long upperBound) {
+    for (long i = 2; i < sqrt(upperBound); i++) {
         if (array[i - 2]) {
-            for (int j = i * i; j <= upperBound; j += i) {
+            for (long j = i * i; j <= upperBound; j += i) {
                 array[j - 2] = false;
             }
         }
     }
 }
 
-int countPrimeNumbers(bool *array, int numberOfElements) {
-    int count = 0;
-    for (int i = 0; i < numberOfElements; i++) {
+long countPrimeNumbers(bool *array, long numberOfElements) {
+    long count = 0;
+    for (long i = 0; i < numberOfElements; i++) {
         if (array[i]) {
             count++;
         }
@@ -34,8 +34,8 @@ int countPrimeNumbers(bool *array, int numberOfElements) {
     return count;
 }
 
-void printResults(int primeNumbers, double time) {
-    printf("Prime numbers found: %d\n", primeNumbers);
+void printResults(long primeNumbers, double time) {
+    printf("Prime numbers found: %ld\n", primeNumbers);
     printf("Time elapsed: %.5f\n", time);
 }
 
@@ -44,14 +44,14 @@ int main(int argc, char **argv) {
         printf("Invalid number of parameters!");
         return -1;
     }
-    if (atoi(argv[1]) <= 2) {
+    if (atol(argv[1]) <= 2) {
         printf("Invalid upper bound!");
         return -1;
     }
 
     double startTime = (double) clock();
 
-    int upperBound = atoi(argv[1]);
+    long upperBound = atol(argv[1]);
 
     bool primeNumbers[upperBound - 1];
 
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
     analysePrimes(primeNumbers, upperBound);
 
-    int count = countPrimeNumbers(primeNumbers, upperBound - 1);
+    long count = countPrimeNumbers(primeNumbers, upperBound - 1);
 
     double endTime = (double) clock();
 
